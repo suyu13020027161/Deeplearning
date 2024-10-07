@@ -1,10 +1,10 @@
 from ultralytics import YOLO
 
 # Load a model
-model = YOLO("/home/ysu/Deeplearning/runs/detect/train4/weights/last.pt")  # pretrained YOLO11n model
+model = YOLO("/home/ysu/Deeplearning/runs/detect/train/weights/best.pt")  # pretrained YOLO11n model
 
 # Run batched inference on a list of images
-results = model("t3.jpg")  # return a list of Results objects
+results = model("test.jpg")  # return a list of Results objects
 
 # Process results list
 for result in results:

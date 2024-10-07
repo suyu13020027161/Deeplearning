@@ -5,4 +5,4 @@ val: /home/ysu/Deeplearning/datasets/mis/images
 nc: 1
  
 # class names
-names: ['mis']
+names: ['Miscanthus']

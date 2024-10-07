@@ -15,7 +15,7 @@ results = model.train(data='mis.yaml', epochs=50, batch=4)
 results = model.val()
  
 # 使用模型对图片进行目标检测
-results = model('t3.jpg')
+results = model('test.jpg')
  
 # 将模型导出为ONNX格式
 success = model.export(format='onnx')
