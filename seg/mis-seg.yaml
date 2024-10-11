@@ -1,0 +1,8 @@
+train: /home/ysu/Deeplearning/datasets/mis-seg/images  
+val: /home/ysu/Deeplearning/datasets/mis-seg/images 
+ 
+# number classes
+nc: 1
+ 
+# class names
+names: ['Miscanthus']
