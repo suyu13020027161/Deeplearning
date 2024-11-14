@@ -4,9 +4,17 @@ from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from PIL import Image
+from tensorflow.keras.metrics import BinaryAccuracy
+
+
+def dice_loss(y_true, y_pred):
+    numerator = 2 * sum(y_true * y_pred)
+    denominator = sum(y_true + y_pred)
+    return 1 - numerator / denominator
+
 
 # 加载训练好的模型
-model = load_model('fig.h5')
+model = load_model('fig.h5', custom_objects={'dice_loss': dice_loss})
 print("Model loaded successfully.")
 
 # 获取模型的输入尺寸
@@ -30,15 +38,44 @@ def preprocess_image(image_path, target_size):
     return image_array
 
 # 检测线段并绘制到原始图像上
-def detect_and_draw_lines(image_path, target_size):
+def detect_and_draw_lines(image_path, label_path):
     # 预处理图像
-    input_img = preprocess_image(image_path, target_size)
+    input_img = preprocess_image(image_path, (600, 800))
     
     # 使用模型进行预测
     prediction = model.predict(input_img)
 
+
+
+
+    # 计算准确率
+    label = cv2.imread(label_path, cv2.IMREAD_GRAYSCALE)  # 直接读取为灰度图
+    label = cv2.resize(label, (600, 800))
+    
+    test_predictions = tf.squeeze(prediction)
     
     
+    
+    
+    
+    
+    
+    accuracy = BinaryAccuracy()
+    accuracy.update_state(label, test_predictions)
+    print("Accuracy on test data:", accuracy.result().numpy())
+    
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
     
     # 将预测结果恢复为二维图像
     predicted_mask = (prediction[0].reshape(target_size[::-1]) * 255).astype(np.uint8)  # 恢复为(高度, 宽度)并转换为0-255
@@ -83,7 +120,11 @@ def detect_and_draw_lines(image_path, target_size):
 
 # 示例：识别并绘制图像中的线段
 image_path = '1.jpg'  # 替换为实际图片路径
-detect_and_draw_lines(image_path, model_input_shape)
+label_path = '1l.jpg' 
+
+target_size = (600, 800)
+
+detect_and_draw_lines(image_path, label_path)
 
 
 

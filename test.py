@@ -3,14 +3,21 @@ import cv2
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Conv2DTranspose, Activation
+from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Conv2DTranspose, Activation, BatchNormalization
 from tensorflow.keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+from tensorflow.keras.backend import mean, sum
 
 # 设置图像和标注的尺寸
 IMG_WIDTH = 600
 IMG_HEIGHT = 800
+
+def dice_loss(y_true, y_pred):
+    numerator = 2 * sum(y_true * y_pred)
+    denominator = sum(y_true + y_pred)
+    return 1 - numerator / denominator
+
 
 def load_images_and_labels(image_dir, label_dir):
     images = []
@@ -40,7 +47,7 @@ def load_images_and_labels(image_dir, label_dir):
 
 
 
-
+    '''
     i = 0
     while i < len(labels):
         plt.figure(figsize=(10, 5))
@@ -54,7 +61,7 @@ def load_images_and_labels(image_dir, label_dir):
 
         plt.show()
         i = i + 1
-
+    '''
 
 
     
@@ -63,8 +70,10 @@ def load_images_and_labels(image_dir, label_dir):
 def build_model():
     inputs = Input((IMG_HEIGHT, IMG_WIDTH, 3))
     x = Conv2D(16, (3, 3), activation='relu', padding='same')(inputs)
+    x = BatchNormalization()(x)
     x = MaxPooling2D((2, 2))(x)
     x = Conv2D(32, (3, 3), activation='relu', padding='same')(x)
+    x = BatchNormalization()(x)
     x = MaxPooling2D((2, 2))(x)
     x = Conv2DTranspose(32, (3, 3), strides=(2, 2), padding='same', activation='relu')(x)
     x = Conv2DTranspose(16, (3, 3), strides=(2, 2), padding='same', activation='relu')(x)
@@ -85,7 +94,7 @@ def main():
         images, labels, test_size=0.2, random_state=42)
 
     model = build_model()
-    model.fit(train_images, train_labels, epochs=10, batch_size=2, validation_split=0.1)
+    model.fit(train_images, train_labels, epochs=2, batch_size=2, validation_split=0.1)
     model.save('fig.h5')
 
 

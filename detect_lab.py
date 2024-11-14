@@ -2,14 +2,16 @@ import cv2
 import numpy as np
 from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
+from tensorflow.keras.metrics import BinaryAccuracy
+import tensorflow as tf
 
 # 加载训练好的模型
-model = load_model('new.h5')
+model = load_model('lab.h5')
 print("Model loaded successfully.")
 
 # 获取模型的输入尺寸
 model_input_shape = (model.input_shape[2], model.input_shape[1])  # (width, height)
-print(model_input_shape)
+#print(model_input_shape)
 
 
 # 预处理图像：调整大小并归一化
@@ -19,8 +21,11 @@ def preprocess_image(image_path, target_size):
         raise ValueError(f"Image not found at {image_path}")
     img = cv2.resize(img, target_size)  # 调整大小到模型输入尺寸
     img = img / 255.0  # 归一化
+    #plt.imshow(img)
+    #plt.show()     
     img = np.expand_dims(img, axis=-1)  # 增加通道维度
     img = np.expand_dims(img, axis=0)   # 增加批次维度
+
     return img
 
 # 检测线段并绘制到原始图像上
@@ -32,6 +37,19 @@ def detect_and_draw_lines(image_path, target_size):
     prediction = model.predict(input_img)
     #plt.imshow(mask)
     #plt.show()    
+    
+    
+    
+    # 计算准确率
+    label = cv2.imread('1l.jpg', cv2.IMREAD_GRAYSCALE)  # 直接读取为灰度图
+    label = cv2.resize(label, (600, 800))
+    
+    test_predictions = tf.squeeze(prediction)
+    accuracy = BinaryAccuracy()
+    accuracy.update_state(label, test_predictions)
+    print("Accuracy on test data:", accuracy.result().numpy())    
+    
+    
     
     
     # 将预测结果恢复为二维图像
@@ -73,7 +91,7 @@ def detect_and_draw_lines(image_path, target_size):
 
 # 示例：识别并绘制图像中的线段
 image_path = '1.jpg'  # 替换为实际图片路径
-detect_and_draw_lines(image_path, model_input_shape)
+detect_and_draw_lines(image_path, (600,800))
 
 
 

@@ -8,9 +8,6 @@ from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, c
 from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
 import os
-from tensorflow.keras.losses import BinaryCrossentropy
-from tensorflow.keras.initializers import HeNormal
-from tensorflow.keras.metrics import Precision, Recall, Accuracy
 
 
 
@@ -125,24 +122,18 @@ def load_data(file_path):
 # 构建模型
 def build_model():
     model = Sequential([
-        Conv2D(128, (1, 1), activation='relu', kernel_initializer=HeNormal(), input_shape=(800, 600, 1)),
+        Conv2D(64, (1, 1), activation='relu', input_shape=(800, 600, 1)),
         MaxPooling2D(2, 2),
-        Conv2D(128, (1, 1), activation='relu', kernel_initializer=HeNormal()),
+        Conv2D(64, (1, 1), activation='relu'),
         MaxPooling2D(2, 2),
-        Conv2D(128, (1, 1), activation='relu', kernel_initializer=HeNormal()),
+        Conv2D(64, (1, 1), activation='relu'),
         MaxPooling2D(2, 2),
-        Conv2D(256, (1, 1), activation='relu', kernel_initializer=HeNormal()),
-        MaxPooling2D(2, 2),        
         Flatten(),
-        Dense(256, activation='relu', kernel_initializer=HeNormal()),        
+        Dense(128, activation='relu'),
         Dense(600 * 800, activation='sigmoid'),
         tf.keras.layers.Reshape((800, 600))
     ])
-    
-    # 设置更高的学习率
-    optimizer = Adam(learning_rate=0.001)  # 默认值通常是 0.001, 增加到更高的值如 0.01 或根据需要调整     
-    
-    model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=[Precision()])
+    model.compile(optimizer=Adam(), loss='binary_crossentropy', metrics=['accuracy'])
     return model
 
 
@@ -157,14 +148,8 @@ images, masks = prepare_images_and_labels(image_path, csv_path)
 
 
 train_images, test_images, train_labels, test_labels = train_test_split(images, masks, test_size=0.2, random_state=42)
-
-
-
-#train_images = np.expand_dims(train_images, axis=-1)  # 增加一个维度以匹配CNN输入
-#test_images = np.expand_dims(test_images, axis=-1)
-
-
-
+train_images = np.expand_dims(train_images, axis=-1)  # 增加一个维度以匹配CNN输入
+test_images = np.expand_dims(test_images, axis=-1)
 
 
 
@@ -174,7 +159,7 @@ model = build_model()
 
 
 
-history = model.fit(train_images, train_labels, epochs=5, batch_size=5, validation_data=(test_images, test_labels))
+history = model.fit(train_images, train_labels, epochs=10, batch_size=5, validation_split=0.3)
 model.save('lab.h5')
 
 model.evaluate(test_images, test_labels)
