@@ -1,8 +1,8 @@
 #苏雨的关键点预测结果读取并显示程序
 import cv2
 import matplotlib.pyplot as plt
-result_path = '/home/ysu/Deeplearning/linedetect/YOLO based/runs/pose/predict/labels/6.txt'
-image_path = '/home/ysu/Deeplearning/linedetect/YOLO based/6.jpg'
+result_path = '/home/ysu/Deeplearning/linedetect/YOLO based/runs/pose/predict/labels/1.txt'
+image_path = '/home/ysu/Deeplearning/linedetect/YOLO based/1.jpg'
 
 
 
